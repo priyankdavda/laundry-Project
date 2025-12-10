@@ -43,7 +43,7 @@
                     </p>
                 </a>
             </li>
-            <li class="nav-item">
+            {{--  <li class="nav-item">
                 <a href="{{ route('admin.subcategory.index') }}"
                     class="nav-link {{ Route::is('admin.subcategory.index') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-list"></i>
@@ -51,8 +51,8 @@
                         <span class="badge badge-secondary right">{{ $SubCategoryCount }}</span>
                     </p>
                 </a>
-            </li>
-            <li class="nav-item">
+            </li>  --}}
+            {{--  <li class="nav-item">
                 <a href="{{ route('admin.collection.index') }}"
                     class="nav-link {{ Route::is('admin.collection.index') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-file-pdf"></i>
@@ -60,13 +60,22 @@
                         <span class="badge badge-primary right">{{ $CollectionCount }}</span>
                     </p>
                 </a>
-            </li>
+            </li>  --}}
             <li class="nav-item">
                 <a href="{{ route('admin.product.index') }}"
                     class="nav-link {{ Route::is('admin.product.index') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-th"></i>
                     <p>Products
                         <span class="badge badge-warning right">{{ $ProductCount }}</span>
+                    </p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.orderstatus.index') }}"
+                    class="nav-link {{ Route::is('admin.orderstatus.index') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-rocket"></i>
+                    <p>Order Status
+                        <span class="badge badge-success right">{{ $OrderstatusCount }}</span>
                     </p>
                 </a>
             </li>

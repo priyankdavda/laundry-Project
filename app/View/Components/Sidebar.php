@@ -13,6 +13,9 @@ use Illuminate\View\Component;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
+use App\Models\OrderStatus;
+
+
 class Sidebar extends Component
 {
     /**
@@ -22,24 +25,27 @@ class Sidebar extends Component
     {
         $userCount = User::count();
         view()->share('userCount',$userCount);
-        
+
         $RoleCount = Role::count();
         view()->share('RoleCount',$RoleCount);
-        
+
         $PermissionCount = Permission::count();
         view()->share('PermissionCount',$PermissionCount);
-        
+
         $CategoryCount = Category::count();
         view()->share('CategoryCount',$CategoryCount);
-        
+
         $SubCategoryCount = SubCategory::count();
         view()->share('SubCategoryCount',$SubCategoryCount);
-        
+
         $CollectionCount = Collection::count();
         view()->share('CollectionCount',$CollectionCount);
-        
+
         $ProductCount = Product::count();
         view()->share('ProductCount',$ProductCount);
+
+        $OrderstatusCount = OrderStatus::count();
+        view()->share('OrderstatusCount',$OrderstatusCount);
     }
 
     /**

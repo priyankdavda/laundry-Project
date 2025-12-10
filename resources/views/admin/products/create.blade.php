@@ -34,7 +34,7 @@
                                             <x-error>name</x-error>
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                {{--  <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="collection">Collection</label>
                                         <select name="collection" id="collection" class="form-control" required>
@@ -46,7 +46,7 @@
                                         </select>
                                         <x-error>collection</x-error>
                                     </div>
-                                </div>
+                                </div>  --}}
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="category" class="form-label">Category</label>
@@ -59,7 +59,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                {{--  <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="subcategory" class="form-label">Sub Category</label>
                                         <select name="subcategory" id="subcategory" class="form-control">
@@ -67,23 +67,23 @@
                                         </select>
                                         <x-error>subcategory</x-error>
                                     </div>
-                                </div>
-                                <div class="col-lg-6">
+                                </div>  --}}
+                                {{--  <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="image" class="form-label">Image</label>
                                         <input type="file" name="image" id="image" class="form-control"
                                             required>
                                         <x-error>image</x-error>
                                     </div>
-                                </div>
-                                <div class="col-lg-6">
+                                </div>  --}}
+                                {{--  <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="product-images" class="form-label">Product Slider Images</label>
                                         <input type="file" name="product_images[]" id="product-images"
                                             class="form-control" multiple>
                                             <x-error>product_images</x-error>
                                     </div>
-                                </div>
+                                </div>  --}}
                             </div>
                         </div>
                         <div class="card-footer">

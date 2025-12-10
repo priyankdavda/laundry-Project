@@ -10,6 +10,10 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SubCateoryController;
 use Illuminate\Support\Facades\Route;
 
+
+use App\Http\Controllers\OrderstatusController;
+
+
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard',[ProfileController::class,'dashboard'])->name('dashboard');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -25,5 +29,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
         Route::resource('product',ProductController::class);
         Route::get('/get/subcategory',[ProductController::class,'getsubcategory'])->name('getsubcategory');
         Route::get('/remove-external-img/{id}',[ProductController::class,'removeImage'])->name('remove.image');
+
+
+        Route::resource('orderstatus',OrderstatusController::class);
+
     });
 });

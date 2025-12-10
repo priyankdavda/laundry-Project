@@ -23,8 +23,23 @@ class User extends Authenticatable
         'password',
         'phonenumber',
         'provider_id',
-        'avatar'
+        'avatar',
+
+        'customer_code',
+        'mobile',
+        'user_type',
+        'house_no',
+        'landmark',
+        'address',
+        'city_id',
+        'state_id',
+        'pincode',
+        'wallet_balance',
+        'company_name',
+        'gstin',
+        'status',
     ];
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -44,5 +59,17 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'wallet_balance'    => 'decimal:2'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // After creating a user, generate customer_code
+        static::created(function ($user) {
+            $user->customer_code = 'LCUST' . str_pad($user->id, 5, '0', STR_PAD_LEFT);
+            $user->save();
+        });
+    }
 }

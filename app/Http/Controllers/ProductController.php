@@ -52,11 +52,12 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // dd('hello');
         $request->validate([
             'name' => 'required|max:255',
-            'collection' => 'required',
+            // 'collection' => 'required',
             'category' => 'required',
-            'image' => 'required|image',
+            // 'image' => 'required|image',
         ]);
 
         // Generate unique slug
@@ -71,15 +72,15 @@ class ProductController extends Controller
         // Create new product instance
         $product = new Product();
         $product->name = $request->name;
-        $product->collection_id = $request->collection;
+        // $product->collection_id = $request->collection;
         $product->category_id = $request->category;
-        $product->sub_category_id = $request->subcategory;
+        // $product->sub_category_id = $request->subcategory;
         $product->slug = $uniqueSlug;
         $product->save();
         $productId = $product->id;
-        $product->image = $this->imageService->compressAndStoreImage($request->file('image'), $uniqueSlug, 'product');
+        // $product->image = $this->imageService->compressAndStoreImage($request->file('image'), $uniqueSlug, 'product');
         $product->save();
-        $this->handleProductSliderImages($request->file('product_images'), $productId);
+        // $this->handleProductSliderImages($request->file('product_images'), $productId);
         return redirect()->route('admin.product.index')->with('success', 'Product created successfully.');
     }
 
