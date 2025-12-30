@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 
 use App\Http\Controllers\OrderstatusController;
-
+use App\Http\Controllers\OrderController;
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard',[ProfileController::class,'dashboard'])->name('dashboard');
@@ -32,6 +32,43 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
 
 
         Route::resource('orderstatus',OrderstatusController::class);
+        Route::resource('order', OrderController::class);
+         Route::get('order/get-user/{user}', [OrderController::class, 'getUser'])
+        ->name('order.get-user');
+
+        // get product details (for JS auto-fill)
+        Route::get('order/get-product/{product}', [OrderController::class, 'getProduct'])
+            ->name('order.get-product');
+
+        Route::get('/admin/order/{order}', [OrderController::class, 'show'])
+            ->name('admin.order.show');
+
+         Route::post(
+            'orders/{order}/update-pickup',
+            [OrderController::class, 'updatePickup']
+        )->name('order.updatePickup');
+
+        //  Assign Pick Up
+        Route::post(
+            'orders/assign-pickup',
+            [OrderController::class, 'assignPickup']
+        )->name('order.assignPickup');
+
+        Route::post(
+            'orders/{order}/change-delivery',
+            [OrderController::class, 'changeDelivery']
+        )->name('order.changeDelivery');
+
+        Route::post(
+    'order/assign-delivery',
+    [OrderController::class, 'assignDelivery']
+)->name('order.assignDelivery');
+
+
+
+
+        Route::get('products/by-category/{category}', [ProductController::class,'byCategory'])->name('admin.products.by-category');
+
 
     });
 });

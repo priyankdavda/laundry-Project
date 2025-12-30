@@ -18,13 +18,19 @@ class Product extends Model
         'sub_category_id',
         'collection_id',
         'image',
+        'amount',
     ];
+
+    public function getAmountAttribute($value)
+    {
+        return $value !== null ? (float)$value : (float)$this->attributes['price'];
+    }
 
     public function category()
     {
         return $this->belongsTo(Category::class,'category_id');
     }
-    
+
     public function subcategory()
     {
         return $this->belongsTo(SubCategory::class,'sub_category_id');

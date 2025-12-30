@@ -209,4 +209,9 @@ class ProductController extends Controller
         }
         return redirect()->route('admin.product.index')->with('error', 'Product deleted successfully.');
     }
+
+    public function byCategory($categoryId) {
+        $products = Product::where('category_id', $categoryId)->get(['id','name','amount']);
+        return response()->json($products);
+    }
 }

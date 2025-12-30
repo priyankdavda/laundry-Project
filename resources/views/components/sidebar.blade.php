@@ -79,6 +79,15 @@
                     </p>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.order.index') }}"
+                    class="nav-link {{ Route::is('admin.order.index') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-rocket"></i>
+                    <p>Order
+                        {{--  <span class="badge badge-success right">{{ $OrderstatusCount }}</span>  --}}
+                    </p>
+                </a>
+            </li>
         @endrole
         <li class="nav-item">
             <a href="{{ route('admin.profile.edit') }}"
