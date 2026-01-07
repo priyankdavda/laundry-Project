@@ -57,6 +57,7 @@ class ProductController extends Controller
             'name' => 'required|max:255',
             // 'collection' => 'required',
             'category' => 'required',
+            'amount' => 'required',
             // 'image' => 'required|image',
         ]);
 
@@ -74,6 +75,7 @@ class ProductController extends Controller
         $product->name = $request->name;
         // $product->collection_id = $request->collection;
         $product->category_id = $request->category;
+        $product->amount = $request->amount;
         // $product->sub_category_id = $request->subcategory;
         $product->slug = $uniqueSlug;
         $product->save();
@@ -121,53 +123,88 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    // public function update(Request $request)
+    // {
+    //     $request->validate([
+    //         'name' => 'required|max:255',
+    //         'collection' => 'required',
+    //         'category' => 'required',
+    //     ]);
+    //     $baseSlug = Str::slug($request->name);
+    //     $uniqueSlug = $baseSlug;
+    //     $counter = 1;
+    //     while (Product::where('slug', $uniqueSlug)->where('id', '!=', $request->id)->exists()) {
+    //         $uniqueSlug = $baseSlug . '-' . $counter;
+    //         $counter++;
+    //     }
+    //     $product = Product::find($request->id);
+    //     $product->name = $request->name;
+    //     $product->collection_id = $request->collection;
+    //     $product->category_id = $request->category;
+    //     $product->sub_category_id = $request->subcategory;
+    //     $product->slug = $uniqueSlug;
+    //     if ($real_image = $request->file('image')) {
+    //         // Old Image remove
+    //         $product = Product::where('id', $request->id)->first();
+    //         $image_path = public_path('product-image/' . $product->image);
+    //         if (file_exists($image_path)) {
+    //             unlink($image_path);
+    //         }
+    //         // Added new image
+    //         $productRealImage = 'product-image/';
+    //         $realImage = $request->slug . "." . $real_image->getClientOriginalExtension();
+    //         $real_image->move($productRealImage, $realImage);
+    //         $product->image = $realImage;
+    //     }
+    //     $product->save();
+    //     $productId = $product->id;
+    //     if ($request->hasFile('image')) {
+    //         foreach ($request->file('image') as $image) {
+    //             $realImage = $request->slug . "-" . rand(1, 9999) . "-" . date('d-m-Y-h-s') . "." . $image->getClientOriginalExtension();
+    //             $path = $image->move('product-slider-images', $realImage);
+    //             ProductImage::create([
+    //                 'product_id' => $productId,
+    //                 'image' => $realImage,
+    //             ]);
+    //         }
+    //     }
+
+    //     return redirect()->route('admin.product.index')->with('success', 'Product created successfully');
+    // }
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|max:255',
-            'collection' => 'required',
+            'name'     => 'required|max:255',
             'category' => 'required',
+            'amount'   => 'required',
         ]);
+
+        $product = Product::findOrFail($id);
+
+        // Generate unique slug (except current product)
         $baseSlug = Str::slug($request->name);
         $uniqueSlug = $baseSlug;
         $counter = 1;
-        while (Product::where('slug', $uniqueSlug)->where('id', '!=', $request->id)->exists()) {
+
+        while (
+            Product::where('slug', $uniqueSlug)
+                ->where('id', '!=', $product->id)
+                ->exists()
+        ) {
             $uniqueSlug = $baseSlug . '-' . $counter;
             $counter++;
         }
-        $product = Product::find($request->id);
-        $product->name = $request->name;
-        $product->collection_id = $request->collection;
-        $product->category_id = $request->category;
-        $product->sub_category_id = $request->subcategory;
-        $product->slug = $uniqueSlug;
-        if ($real_image = $request->file('image')) {
-            // Old Image remove
-            $product = Product::where('id', $request->id)->first();
-            $image_path = public_path('product-image/' . $product->image);
-            if (file_exists($image_path)) {
-                unlink($image_path);
-            }
-            // Added new image
-            $productRealImage = 'product-image/';
-            $realImage = $request->slug . "." . $real_image->getClientOriginalExtension();
-            $real_image->move($productRealImage, $realImage);
-            $product->image = $realImage;
-        }
-        $product->save();
-        $productId = $product->id;
-        if ($request->hasFile('image')) {
-            foreach ($request->file('image') as $image) {
-                $realImage = $request->slug . "-" . rand(1, 9999) . "-" . date('d-m-Y-h-s') . "." . $image->getClientOriginalExtension();
-                $path = $image->move('product-slider-images', $realImage);
-                ProductImage::create([
-                    'product_id' => $productId,
-                    'image' => $realImage,
-                ]);
-            }
-        }
 
-        return redirect()->route('admin.product.index')->with('success', 'Product created successfully');
+        // Update product
+        $product->name = $request->name;
+        $product->category_id = $request->category;
+        $product->amount = $request->amount;
+        $product->slug = $uniqueSlug;
+        $product->save();
+
+        return redirect()
+            ->route('admin.product.index')
+            ->with('success', 'Product updated successfully.');
     }
 
     /**

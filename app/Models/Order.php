@@ -69,6 +69,10 @@ class Order extends Model
     {
         return $this->belongsTo(OrderStatus::class, 'status_id');
     }
+    public function statusHistories()
+    {
+        return $this->hasMany(OrderStatusHistory::class)->latest();
+    }
 
     public function items()
     {
@@ -81,6 +85,11 @@ class Order extends Model
     public function deliveryRunner()
     {
         return $this->belongsTo(User::class, 'delivery_assign_id');
+    }
+
+    public function scopeNotCancelled($query)
+    {
+        return $query->where('status_id', '!=', 5);
     }
 
 }

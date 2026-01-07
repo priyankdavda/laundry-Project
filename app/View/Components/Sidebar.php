@@ -14,6 +14,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 use App\Models\OrderStatus;
+use App\Models\Order;
 
 
 class Sidebar extends Component
@@ -46,6 +47,9 @@ class Sidebar extends Component
 
         $OrderstatusCount = OrderStatus::count();
         view()->share('OrderstatusCount',$OrderstatusCount);
+
+        $OrderCount = Order::count();
+        view()->share('OrderCount',$OrderCount);
     }
 
     /**

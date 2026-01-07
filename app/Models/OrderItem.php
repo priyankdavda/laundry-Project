@@ -17,6 +17,7 @@ class OrderItem extends Model
         'quantity',
         'line_total_amount',
         'remark',
+        'no_of_clothes',
     ];
 
     protected $casts = [

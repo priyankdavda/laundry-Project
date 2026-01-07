@@ -10,7 +10,7 @@
         </div>
 
         <div class="card-body table-responsive">
-            <table class="table table-bordered table-sm">
+            <table class="table table-bordered table-sm" id="orderTable">
                 <thead>
                     <tr>
                         <th>Order No</th>
@@ -59,13 +59,13 @@
                                 <small class="text-muted">{{ $order->pickup_timeslot }}</small>
                                 <br>
                                  <button class="btn btn-sm btn-warning mb-1"
-        onclick="openPickupModal(
-    {{ $order->id }},
-    '{{ \Carbon\Carbon::parse($order->pickup_date)->format('Y-m-d') }}',
-    '{{ $order->pickup_timeslot }}'
-)">
-    Change Pick Up
-</button>
+                                            onclick="openPickupModal(
+                                        {{ $order->id }},
+                                        '{{ \Carbon\Carbon::parse($order->pickup_date)->format('Y-m-d') }}',
+                                        '{{ $order->pickup_timeslot }}'
+                                    )">
+                                        Change Pick Up
+                                    </button>
                                 <br>
 
                                     <button class="btn btn-sm btn-success"
@@ -80,13 +80,13 @@
                                 <small class="text-muted">{{ $order->delivery_timeslot }}</small>
                                 <br>
                                 <button
-    class="btn btn-sm btn-warning btn-change-delivery"
-    data-id="{{ $order->id }}"
-    data-date="{{ \Carbon\Carbon::parse($order->delivery_date)->format('Y-m-d') }}"
-    data-time="{{ $order->delivery_timeslot }}"
->
-    Change Delivery
-</button>
+                                    class="btn btn-sm btn-warning mb-1 btn-change-delivery"
+                                    data-id="{{ $order->id }}"
+                                    data-date="{{ \Carbon\Carbon::parse($order->delivery_date)->format('Y-m-d') }}"
+                                    data-time="{{ $order->delivery_timeslot }}"
+                                >
+                                    Change Delivery
+                                </button>
 
                                 <br>
                                 <button class="btn btn-sm btn-primary btn-assign-delivery"
@@ -102,6 +102,72 @@
                             <td>
                                 {{ $order->created_at->format('d-m-Y') }}<br>
                                 <small class="text-muted">{{ $order->created_at->format('h:i A') }}</small>
+                                <br>
+                               @if($order->status->code === 'DELIVERED_PAID')
+
+                                    {{-- ✅ Final Delivered Paid View --}}
+                                    <span class="text-success font-weight-bold">
+                                        Delivered Paid
+                                    </span>
+                                    <br>
+
+                                    <span class="badge badge-primary mt-1">
+                                        Paid Date:
+                                        {{ optional($order->updated_at)->format('Y-m-d H:i:s') }}
+                                    </span>
+                                    <br>
+
+                                    <span class="text-danger font-weight-bold">
+                                        Paid Amount: Rs. {{ number_format($order->paid_amount, 2) }}
+                                    </span>
+                                    <br>
+
+                                    {{-- Status History --}}
+                                    <button class="btn btn-sm btn-danger mt-1"
+                                        data-toggle="modal"
+                                        data-target="#statusHistoryModal"
+                                        data-order-id="{{ $order->id }}"
+                                        data-order-no="{{ $order->order_number }}">
+                                        Status History
+                                    </button>
+
+                                @elseif($order->status->code === 'CANCEL')
+
+                                    {{-- ❌ Cancelled --}}
+                                    <span class="badge badge-danger">Cancelled</span>
+                                    <br>
+
+                                    <button class="btn btn-sm btn-secondary mt-1"
+                                        data-toggle="modal"
+                                        data-target="#statusHistoryModal"
+                                        data-order-id="{{ $order->id }}"
+                                        data-order-no="{{ $order->order_number }}">
+                                        Status History
+                                    </button>
+
+                                @else
+
+                                    {{-- 🔄 Active Order --}}
+                                    <button class="btn btn-sm btn-primary mb-1"
+                                        data-toggle="modal"
+                                        data-target="#statusModal"
+                                        data-order-id="{{ $order->id }}"
+                                        data-order-no="{{ $order->order_number }}">
+                                        Change Status
+                                    </button>
+                                    <br>
+
+                                    <button class="btn btn-sm btn-secondary"
+                                        data-toggle="modal"
+                                        data-target="#statusHistoryModal"
+                                        data-order-id="{{ $order->id }}"
+                                        data-order-no="{{ $order->order_number }}">
+                                        Status History
+                                    </button>
+
+                                @endif
+
+
                             </td>
 
 
@@ -111,6 +177,17 @@
                                     data-id="{{ $order->id }}">
                                     View Order
                                 </button>
+                                <br>
+                                <br>
+                                @if($order->items->count())
+                                    <a href="{{ route('admin.order.createTag', $order->id) }}"
+                                    target="_blank"
+                                    class="btn btn-sm btn-outline-primary">
+                                        <i class="fa fa-tag"></i>
+                                    </a>
+
+                                @endif
+
 
                             </td>
                         </tr>
@@ -122,7 +199,7 @@
                 </tbody>
             </table>
 
-            {{ $orders->links() }}
+            {{--  {{ $orders->links() }}  --}}
         </div>
     </div>
 </x-admin>
@@ -289,6 +366,93 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="statusModal">
+  <div class="modal-dialog">
+    <form method="POST" id="statusForm">
+      @csrf
+
+      <div class="modal-content">
+
+        {{-- HEADER --}}
+        <div class="modal-header bg-light">
+          <h5 class="modal-title">
+            Update Order Status of
+            <span class="text-success font-weight-bold" id="modalOrderNo"></span>
+          </h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        {{-- BODY --}}
+        <div class="modal-body">
+
+          {{-- 🔴 CANCEL BUTTON (SEPARATE) --}}
+          <div class="text-center mb-3">
+            <button type="button"
+                class="btn btn-danger btn-sm"
+                id="cancelOrderBtn">
+                Click Here To Cancel Order
+            </button>
+          </div>
+
+          {{-- STATUS DROPDOWN --}}
+          <div class="form-group row">
+            <label class="col-sm-4 col-form-label">Order Status</label>
+            <div class="col-sm-8">
+              <select name="status_id" id="statusDropdown"
+                      class="form-control" required>
+                <option value="">Select Status</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        {{-- FOOTER --}}
+        <div class="modal-footer">
+          <button class="btn btn-info btn-sm">Update Status</button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="statusHistoryModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header bg-light">
+        <h5 class="modal-title">
+          Order Status History of
+          <span class="text-warning font-weight-bold" id="historyOrderNo"></span>
+        </h5>
+        <button class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+
+        <table class="table table-bordered table-sm">
+          <thead class="thead-light">
+            <tr>
+              <th>Update Date</th>
+              <th>Order Status</th>
+              <th>Update By</th>
+            </tr>
+          </thead>
+          <tbody id="statusHistoryBody">
+            <tr>
+              <td colspan="3" class="text-center">
+                <i class="fa fa-spinner fa-spin"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+    </div>
+  </div>
+</div>
 
 
 <script>
@@ -398,3 +562,109 @@ $('#saveChangeDelivery').click(function () {
     });
 });
 </script>
+<script>
+$('#statusModal').on('show.bs.modal', function (event) {
+
+    let button   = $(event.relatedTarget);
+    let orderId  = button.data('order-id');
+    let orderNo  = button.data('order-no');
+
+    // Order no show
+    $('#modalOrderNo').text(orderNo);
+
+    // Form action
+    $('#statusForm').attr(
+        'action',
+        '/admin/orders/' + orderId + '/update-status'
+    );
+
+    // Cancel button action
+    $('#cancelOrderBtn').off('click').on('click', function () {
+        if (!confirm('Are you sure you want to cancel this order?')) return;
+
+        $.post('/admin/orders/' + orderId + '/cancel', {
+            _token: '{{ csrf_token() }}'
+        }, function () {
+            location.reload();
+        });
+    });
+
+    // Load ONLY NEXT status
+    let dropdown = $('#statusDropdown');
+    dropdown.html('<option value="">Select Status</option>');
+
+    $.get('/admin/orders/' + orderId + '/next-statuses', function (data) {
+        data.forEach(function (status) {
+            dropdown.append(
+                `<option value="${status.id}">${status.name}</option>`
+            );
+        });
+    });
+});
+</script>
+<script>
+$('#statusHistoryModal').on('show.bs.modal', function (event) {
+
+    let button  = $(event.relatedTarget);
+    let orderId = button.data('order-id');
+    let orderNo = button.data('order-no');
+
+    $('#historyOrderNo').text(orderNo);
+
+    let tbody = $('#statusHistoryBody');
+    tbody.html(`
+        <tr>
+            <td colspan="3" class="text-center">
+                <i class="fa fa-spinner fa-spin"></i>
+            </td>
+        </tr>
+    `);
+
+    $.get('/admin/orders/' + orderId + '/status-history', function (data) {
+
+        if (data.length === 0) {
+            tbody.html(`
+                <tr>
+                    <td colspan="3" class="text-center">No history found</td>
+                </tr>
+            `);
+            return;
+        }
+
+        tbody.empty();
+        data.forEach(function (row) {
+            tbody.append(`
+                <tr>
+                    <td>${row.date}</td>
+                    <td>${row.status}</td>
+                    <td>${row.by}</td>
+                </tr>
+            `);
+        });
+    });
+});
+</script>
+
+
+
+<script>
+$(function () {
+    $('#orderTable').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        responsive: true,
+        pageLength: 25,
+        order: [[8, 'desc']], // Order Date column
+        columnDefs: [
+            { orderable: false, targets: [-1] } // Action column disable sort
+        ]
+    });
+});
+</script>
+
+
+
+
+
+

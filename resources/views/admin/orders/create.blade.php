@@ -331,14 +331,14 @@
                                                value="{{ old('paid_amount') }}">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                {{--  <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Wallet Used Amount (optional)</label>
                                         <input type="number" step="0.01" name="wallet_used_amount"
                                                id="wallet_used_amount" class="form-control"
                                                value="{{ old('wallet_used_amount') }}">
                                     </div>
-                                </div>
+                                </div>  --}}
                             </div>
 
                             <div class="form-group">

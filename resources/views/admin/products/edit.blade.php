@@ -25,7 +25,7 @@
                                             <x-error>name</x-error>
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                {{--  <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="collection">Collection</label>
                                         <select name="collection" id="collection" class="form-control" required>
@@ -40,7 +40,7 @@
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
-                                </div>
+                                </div>  --}}
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="category" class="form-label">Category</label>
@@ -55,6 +55,17 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Amount</label>
+                                        <input type="text"
+                                               name="amount"
+                                               value="{{ old('amount', $data->amount) }}"
+                                               class="form-control"
+                                               required>
+                                        <x-error>amount</x-error>
+                                    </div>
+                                </div>
+                                {{--  <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="subcategory" class="form-label">Sub Category</label>
                                         <select name="subcategory" id="subcategory" class="form-control">
@@ -95,7 +106,7 @@
                                             </div>
                                         @endforeach
                                     </div>
-                                </div>
+                                </div>  --}}
                             </div>
                         </div>
                         <div class="card-footer">

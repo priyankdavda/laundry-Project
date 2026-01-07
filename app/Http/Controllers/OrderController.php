@@ -15,7 +15,10 @@ use App\Models\Category;
 use App\Models\Product;
 
 use App\Models\OrderStatus;
+use App\Models\OrderStatusHistory;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -24,11 +27,15 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::latest()->paginate(20);
+        // $orders = Order::latest()->paginate(20);
+        $orders = Order::with(['items','status'])
+                    ->latest()
+                    ->get();
 
         $runners = User::where('user_type', 'ASSIGN')
                     ->where('status', 'ACTIVE')
                     ->get();
+
 
         return view('admin.orders.index', compact('orders', 'runners'));
     }
@@ -54,6 +61,7 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'customer_type'      => 'required|in:registered,new',
             'customer_name'      => 'required|string|max:150',
@@ -61,8 +69,8 @@ class OrderController extends Controller
             'house_no'           => 'required|string|max:100',
             'landmark'           => 'required|string|max:150',
             'address'            => 'required|string|max:255',
-            'city_id'            => 'nullable|integer',
-            'state_id'           => 'nullable|integer',
+            'city_id'  => 'required|exists:cities,id',
+            'state_id' => 'required|exists:states,id',
             'pincode'            => 'required|string|max:10',
 
             'pickup_date'        => 'required|date',
@@ -87,9 +95,13 @@ class OrderController extends Controller
             if ($request->customer_type === 'registered') {
                 $user = User::findOrFail($request->registered_user_id);
             } else {
+
+                $nextId = (User::max('id') ?? 0) + 1;
+                $customerCode = 'LCUST' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
                 $user = User::firstOrCreate(
                     ['mobile' => $request->customer_mobile],
                     [
+                        'customer_code'  => $customerCode,
                         'name'           => $request->customer_name,
                         'house_no'       => $request->house_no,
                         'landmark'       => $request->landmark,
@@ -98,6 +110,13 @@ class OrderController extends Controller
                         'city_id'        => $request->city_id,
                         'state_id'       => $request->state_id,
                         'wallet_balance' => 0,
+                        'name'           => $request->customer_name,
+                        'password'          => bcrypt('123456'),
+                        'user_type'      => 'USER',
+                        'status'         => 'ACTIVE',
+                        'company_name'   => $request->company_name,
+                        'gstin'          => $request->gstin,
+                        'email'          => 'cust_'.$request->customer_mobile.'@gmail.com',
                     ]
                 );
             }
@@ -191,10 +210,25 @@ class OrderController extends Controller
                     // 'line_total_amount' => $price * (float) $item['quantity'],
                     'line_total_amount' => (float) $item['unit_price']  * (float) $item['quantity'],
                     'remark'            => $item['remark'] ?? null,
+                    'no_of_clothes' => $item['clothes'] ?? 1,
                 ]);
             }
 
             DB::commit();
+
+            $pdf = Pdf::loadView('admin.orders.invoice', [
+                'order' => $order
+            ]);
+
+            $path = storage_path('app/invoices');
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
+            }
+
+            $fileName = 'invoice_'.$order->order_number.'.pdf';
+            $pdfPath = $path.'/'.$fileName;
+
+            $pdf->save($pdfPath);
 
             return redirect()
                 ->route('admin.order.index')
@@ -202,8 +236,12 @@ class OrderController extends Controller
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            \Log::error($e);
-            return back()->withErrors('Something went wrong while creating the order.');
+
+            dd([
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ]);
         }
     }
 
@@ -347,6 +385,137 @@ class OrderController extends Controller
 
         return back()->with('success', 'Delivery assigned / updated successfully');
     }
+
+   public function createTag(Order $order)
+    {
+        // Order items with product relation (recommended)
+        $items = $order->items()->with('product')->get();
+
+        // ✅ Total clothes calculation (NEW COLUMN)
+        $totalClothes = $items->sum(function ($item) {
+            return ($item->no_of_clothes && $item->no_of_clothes > 0)
+                ? $item->no_of_clothes
+                : 1;
+        });
+
+        return view('admin.orders.tag', compact('order', 'items', 'totalClothes'));
+    }
+public function updateStatus(Request $request, Order $order)
+{
+    // ❌ Final / Cancel order ko change mat hone do
+    if (in_array($order->status->code, ['DELIVERED_PAID', 'CANCEL'])) {
+        return back()->withErrors('Final order status cannot be changed.');
+    }
+
+    $newStatus = OrderStatus::findOrFail($request->status_id);
+
+    // ❌ backward move block
+    if ($newStatus->sort_order <= $order->status->sort_order
+        && $newStatus->code !== 'CANCEL') {
+        return back()->withErrors('Invalid status transition');
+    }
+
+    // 🔥 DELIVERED PAID LOGIC
+    if ($newStatus->code === 'DELIVERED_PAID') {
+
+        $order->update([
+            'status_id'       => $newStatus->id,
+            'paid_amount'     => $order->total_amount,
+            'pending_amount'  => 0,
+            'payment_status'  => 'PAID',
+        ]);
+
+    } else {
+
+        // normal status update
+        $order->update([
+            'status_id' => $newStatus->id
+        ]);
+    }
+
+    // ✅ Status history
+    $order->statusHistories()->create([
+        'status_id'     => $newStatus->id,
+        'updated_by_id' => auth()->id(),
+        'updated_by'    => auth()->user()->name,
+    ]);
+
+    return back()->with('success', 'Order status updated successfully');
+}
+    public function getNextStatuses(Order $order)
+{
+    $currentSortOrder = $order->status->sort_order;
+
+    // 🔥 NEXT STATUS ONLY
+    $nextStatus = OrderStatus::where('sort_order', '>', $currentSortOrder)
+        ->orderBy('sort_order')
+        ->first();
+
+    $statuses = collect();
+
+    if ($nextStatus) {
+        $statuses->push([
+            'id'   => $nextStatus->id,
+            'name' => $nextStatus->name,
+        ]);
+    }
+
+    // 🔥 Optional: Cancel always allowed
+    // $cancelStatus = OrderStatus::where('code', 'CANCEL')->first();
+    // if ($cancelStatus) {
+    //     $statuses->push([
+    //         'id'   => $cancelStatus->id,
+    //         'name' => $cancelStatus->name,
+    //     ]);
+    // }
+
+    return response()->json($statuses);
+}
+public function cancel(Order $order)
+{
+    $cancelStatus = OrderStatus::where('code', 'CANCEL')->firstOrFail();
+
+    // update order
+    $order->update([
+        'status_id' => $cancelStatus->id
+    ]);
+
+    // history
+    $order->statusHistories()->create([
+        'status_id'     => $cancelStatus->id,
+        'updated_by_id' => auth()->id(),
+        'updated_by'    => auth()->user()->name,
+    ]);
+
+    return response()->json(['success' => true]);
+}
+
+public function statusHistory(Order $order)
+{
+    $history = OrderStatusHistory::with(['status', 'updatedBy'])
+        ->where('order_id', $order->id)
+        ->orderBy('created_at', 'asc')
+        ->get()
+        ->map(function ($row) {
+            return [
+                'date'   => Carbon::parse($row->created_at)->format('d-M-Y h:i A'),
+                'status' => $row->status->name,
+                'by'     => $row->updatedBy->name ?? $row->updated_by,
+            ];
+        });
+
+    return response()->json($history);
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

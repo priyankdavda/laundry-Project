@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\OrderstatusController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReportController;
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard',[ProfileController::class,'dashboard'])->name('dashboard');
@@ -60,9 +61,43 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
         )->name('order.changeDelivery');
 
         Route::post(
-    'order/assign-delivery',
-    [OrderController::class, 'assignDelivery']
-)->name('order.assignDelivery');
+            'order/assign-delivery',
+            [OrderController::class, 'assignDelivery']
+        )->name('order.assignDelivery');
+
+
+        Route::get(
+            'order/{order}/tags',
+            [OrderController::class, 'createTag']
+        )->name('order.createTag');
+
+        Route::post(
+            'orders/{order}/update-status',
+            [OrderController::class, 'updateStatus']
+        )->name('orders.updateStatus');
+
+        Route::get(
+            'orders/{order}/next-statuses',
+            [OrderController::class, 'getNextStatuses']
+            )->name('orders.nextStatuses');
+
+        Route::post(
+            'orders/{order}/cancel',
+            [OrderController::class, 'cancel']
+        )->name('orders.cancel');
+
+        Route::get(
+            'orders/{order}/status-history',
+            [OrderController::class, 'statusHistory']
+        )->name('orders.statusHistory');
+
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::post('/reports', [ReportController::class, 'filter'])->name('reports.filter');
+
+
+
+
+
 
 
 

@@ -25,7 +25,7 @@
                     </p>
                 </a>
             </li>
-            <li class="nav-item">
+            {{--  <li class="nav-item">
                 <a href="{{ route('admin.permission.index') }}"
                     class="nav-link {{ Route::is('admin.permission.index') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-hat-cowboy"></i>
@@ -33,7 +33,7 @@
                         <span class="badge badge-danger right">{{ $PermissionCount }}</span>
                     </p>
                 </a>
-            </li>
+            </li>  --}}
             <li class="nav-item">
                 <a href="{{ route('admin.category.index') }}"
                     class="nav-link {{ Route::is('admin.category.index') ? 'active' : '' }}">
@@ -75,7 +75,7 @@
                     class="nav-link {{ Route::is('admin.orderstatus.index') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-rocket"></i>
                     <p>Order Status
-                        <span class="badge badge-success right">{{ $OrderstatusCount }}</span>
+                        <span class="badge badge-danger right">{{ $OrderstatusCount }}</span>
                     </p>
                 </a>
             </li>
@@ -84,18 +84,25 @@
                     class="nav-link {{ Route::is('admin.order.index') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-rocket"></i>
                     <p>Order
-                        {{--  <span class="badge badge-success right">{{ $OrderstatusCount }}</span>  --}}
+                        <span class="badge badge-success right">{{ $OrderCount }}</span>
                     </p>
                 </a>
             </li>
+
         @endrole
         <li class="nav-item">
+                <a href="{{ route('admin.reports.index') }}" class="nav-link {{ Route::is('admin.reports.index') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-chart-line"></i>
+                    <p>Report</p>
+                </a>
+            </li>
+        {{--  <li class="nav-item">
             <a href="{{ route('admin.profile.edit') }}"
                 class="nav-link {{ Route::is('admin.profile.edit') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-id-card"></i>
                 <p>Profile</p>
             </a>
-        </li>
+        </li>  --}}
 
     </ul>
 </nav>

@@ -93,7 +93,7 @@
     {{-- HEADER --}}
     <div class="row invoice-header pb-2">
         <div class="col-md-6">
-            <img src="{{ asset('admin/images/LaundryHub.png') }}" height="120">
+            <img src="{{ asset('admin/dist/img/LaundryHub.png') }}" height="60">
         </div>
         <div class="col-md-6 text-right">
             <p>
@@ -128,7 +128,7 @@
             </p>
 
             <p class="qr-text">Kindly Scan and Pay Your Amount</p>
-            <img src="{{ asset('admin/images/qrcode.jpeg') }}" height="120">
+            <img src="{{ asset('images/gpay-qr.png') }}" height="120">
         </div>
     </div>
 
@@ -149,7 +149,6 @@
                 <td>{{ $i+1 }}</td>
                 <td>
                     {{ $item->product_name }}
-                    ({{ $item->no_of_clothes }})
                     @if($item->remark)
                         <br><small><b>Remark:</b> {{ $item->remark }}</small>
                     @endif
@@ -164,16 +163,6 @@
 
     {{-- TOTALS --}}
     <table class="table table-sm">
-        <tr>
-            <th>Total Clothes</th>
-            <td class="text-right">
-                {{ $order->items->sum(function ($item) {
-                    return ($item->no_of_clothes && $item->no_of_clothes > 0)
-                        ? $item->no_of_clothes
-                        : 1;
-                }) }}
-            </td>
-        </tr>
         <tr>
             <th>Total Cost</th>
             <td class="text-right">{{ number_format($order->subtotal_amount,2) }}</td>

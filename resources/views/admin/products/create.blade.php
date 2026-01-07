@@ -59,6 +59,14 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="name" class="form-label">Amount</label>
+                                        <input type="text" name="amount" id="amount" value="{{ old('amount') }}"
+                                            class="form-control" required>
+                                            <x-error>name</x-error>
+                                    </div>
+                                </div>
                                 {{--  <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="subcategory" class="form-label">Sub Category</label>

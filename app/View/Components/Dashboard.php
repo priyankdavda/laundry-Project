@@ -10,6 +10,11 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
+use App\Models\Order;
+use Carbon\Carbon;
+
+
+
 class Dashboard extends Component
 {
     /**
@@ -19,15 +24,73 @@ class Dashboard extends Component
     {
         $user = User::count();
         view()->share('user',$user);
-        
+
         $category = Category::count();
         view()->share('category',$category);
-        
+
         $product = Product::count();
         view()->share('product',$product);
-        
-        $collection = Collection::count();
-        view()->share('collection',$collection);
+
+        $order = Order::count();
+        view()->share('collection',$order);
+
+        // $collection = Collection::count();
+        // view()->share('collection',$collection);
+
+         $orders = Order::where('status_id', '!=', 5);
+
+
+        // AMOUNTS
+        $totalAmount   = (clone $orders)->sum('total_amount');
+        $paidAmount    = (clone $orders)->sum('paid_amount');
+        $pendingAmount = (clone $orders)->sum('pending_amount');
+
+        view()->share('totalAmount', $totalAmount);
+        view()->share('paidAmount', $paidAmount);
+        view()->share('pendingAmount', $pendingAmount);
+
+        // Month Sell (Total / Paid / Pending)
+        $monthTotal   = (clone $orders)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('total_amount');
+
+        $monthPaid = (clone $orders)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('paid_amount');
+
+        $monthPending = (clone $orders)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('pending_amount');
+
+        view()->share('monthTotal', $monthTotal);
+        view()->share('monthPaid', $monthPaid);
+        view()->share('monthPending', $monthPending);
+
+        // ❌ Cancelled exclude (assume status_id = 5)
+        $orders = Order::where('status_id', '!=', 5);
+
+        // DAILY SELL (Today)
+        $dailySell = (clone $orders)
+            ->whereDate('created_at', Carbon::today())
+            ->sum('total_amount');
+
+        view()->share('dailySell', $dailySell);
+
+
+        // ❌ Cancelled exclude (status_id = 5 assumed)
+        $orders = Order::where('status_id', '!=', 5);
+
+        // DAILY COLLECTION (Today Paid)
+        $dailyCollection = (clone $orders)
+            ->whereDate('created_at', Carbon::today())
+            ->sum('paid_amount');
+
+        view()->share('dailyCollection', $dailyCollection);
+
+
     }
 
     /**
