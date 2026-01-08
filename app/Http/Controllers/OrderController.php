@@ -19,6 +19,7 @@ use App\Models\OrderStatusHistory;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use App\Services\WhatsAppService;
 
 class OrderController extends Controller
 {
@@ -215,6 +216,19 @@ class OrderController extends Controller
             }
 
             DB::commit();
+
+
+            /* ================= WHATSAPP TEST MESSAGE ================= */
+            try {
+                $mobile = '91' . $order->customer_mobile; // country code zaroori
+                WhatsAppService::sendOrderCreatedMessage($mobile, $order);
+            }catch (\Exception $e) {
+                \Log::error('WhatsApp Error', [
+                    'message' => $e->getMessage(),
+                    'response' => method_exists($e, 'getResponse') ? $e->getResponse() : null
+                ]);
+                die('sadasdasdas');
+            }
 
             $pdf = Pdf::loadView('admin.orders.invoice', [
                 'order' => $order
