@@ -12,7 +12,7 @@ use Illuminate\View\Component;
 
 use App\Models\Order;
 use Carbon\Carbon;
-
+use Spatie\Permission\Models\Role;
 
 
 class Dashboard extends Component
@@ -22,7 +22,7 @@ class Dashboard extends Component
      */
     public function __construct()
     {
-        $user = User::count();
+        $user = User::role('user')->count();
         view()->share('user',$user);
 
         $category = Category::count();
@@ -37,7 +37,7 @@ class Dashboard extends Component
         // $collection = Collection::count();
         // view()->share('collection',$collection);
 
-         $orders = Order::where('status_id', '!=', 5);
+         $orders = Order::where('status_id', '!=', 6);
 
 
         // AMOUNTS
@@ -70,7 +70,7 @@ class Dashboard extends Component
         view()->share('monthPending', $monthPending);
 
         // ❌ Cancelled exclude (assume status_id = 5)
-        $orders = Order::where('status_id', '!=', 5);
+        $orders = Order::where('status_id', '!=', 6);
 
         // DAILY SELL (Today)
         $dailySell = (clone $orders)
@@ -81,7 +81,7 @@ class Dashboard extends Component
 
 
         // ❌ Cancelled exclude (status_id = 5 assumed)
-        $orders = Order::where('status_id', '!=', 5);
+        $orders = Order::where('status_id', '!=', 6);
 
         // DAILY COLLECTION (Today Paid)
         $dailyCollection = (clone $orders)

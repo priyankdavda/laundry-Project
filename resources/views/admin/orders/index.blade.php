@@ -279,6 +279,7 @@
           <div class="form-group">
             <label>Select Runner</label>
             <select name="runner_id" class="form-control" required>
+                <option value="">Select Runner</option>
               @foreach($runners as $runner)
                 <option value="{{ $runner->id }}">{{ $runner->name }}</option>
               @endforeach

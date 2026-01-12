@@ -18,7 +18,9 @@ class UserController extends Controller
     }
     public function index()
     {
-        $data = User::orderBy('id','DESC')->get();
+         $data = User::role('user')
+                ->orderBy('id', 'DESC')
+                ->get();
         return view('admin.user.index', compact('data'));
     }
     public function create()
