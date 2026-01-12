@@ -129,7 +129,7 @@ class UserController extends Controller
         ]);
 
         // Assign role
-        $user->assignRole($request->role);
+        $user->syncRoles([$request->role]);
 
         return redirect()
             ->route('admin.user.index')

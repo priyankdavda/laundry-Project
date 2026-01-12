@@ -12,6 +12,7 @@
                         <th>#</th>
                         <th>Name</th>
                         <th>Email</th>
+                        <th>Role</th>
                         <th>Created</th>
                         <th>Action</th>
                         <th></th>
@@ -23,6 +24,17 @@
                             <td>{{ $user->id }}</td>
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
+                           <td>
+                                @php
+                                    $role = $user->getRoleNames()->first();
+                                @endphp
+
+                                @if($role)
+                                    <span class="badge badge-info">{{ $role }}</span>
+                                @else
+                                    <span class="badge badge-secondary">No Role</span>
+                                @endif
+                            </td>
                             <td>{{ $user->created_at }}</td>
                             <td>
                                 <a href="{{ route('admin.user.edit', encrypt($user->id)) }}"

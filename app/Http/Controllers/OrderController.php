@@ -33,9 +33,12 @@ class OrderController extends Controller
                     ->latest()
                     ->get();
 
-        $runners = User::where('user_type', 'ASSIGN')
-                    ->where('status', 'ACTIVE')
-                    ->get();
+        $runners = User::join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('roles.name', 'Assign')
+            ->where('users.status', 'ACTIVE')
+            ->select('users.*')
+            ->get();
 
 
         return view('admin.orders.index', compact('orders', 'runners'));
