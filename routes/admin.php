@@ -11,7 +11,7 @@ use App\Http\Controllers\SubCateoryController;
 use Illuminate\Support\Facades\Route;
 
 
-use App\Http\Controllers\OrderstatusController;
+use App\Http\Controllers\OrderStatusController ;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReportController;
 
@@ -32,7 +32,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
         Route::get('/remove-external-img/{id}',[ProductController::class,'removeImage'])->name('remove.image');
 
 
-        Route::resource('orderstatus',OrderstatusController::class);
+        Route::resource('orderstatus',OrderStatusController ::class);
         Route::resource('order', OrderController::class);
          Route::get('order/get-user/{user}', [OrderController::class, 'getUser'])
         ->name('order.get-user');

@@ -684,11 +684,56 @@
 
     const orderForm = document.getElementById('order-form');
     if (orderForm) {
-        orderForm.addEventListener('submit', function () {
+        orderForm.addEventListener('submit', function (e) {
+
+            const pickupDate   = document.querySelector('input[name="pickup_date"]')?.value;
+            const pickupTime   = document.querySelector('select[name="pickup_timeslot"]')?.value;
+            const deliveryDate = document.querySelector('input[name="delivery_date"]')?.value;
+            const deliveryTime = document.querySelector('select[name="delivery_timeslot"]')?.value;
+
+            // 🔴 Pickup & Delivery validation
+            if (!pickupDate) {
+                alert('Please select Pickup Date');
+                e.preventDefault();
+                return;
+            }
+
+            if (!pickupTime) {
+                alert('Please select Pickup Time');
+                e.preventDefault();
+                return;
+            }
+
+            if (!deliveryDate) {
+                alert('Please select Delivery Date');
+                e.preventDefault();
+                return;
+            }
+
+            if (!deliveryTime) {
+                alert('Please select Delivery Time');
+                e.preventDefault();
+                return;
+            }
+
+            // 🔴 At least one product validation
+            if (!items || items.length === 0) {
+                alert('Please add at least one product to the order');
+                e.preventDefault();
+                return;
+            }
+
+
+            // ✅ All OK → continue submit
             recalcTotals();
-            if (itemsJsonInput && !itemsJsonInput.value) itemsJsonInput.value = JSON.stringify(items);
+
+            if (itemsJsonInput && !itemsJsonInput.value) {
+                itemsJsonInput.value = JSON.stringify(items);
+            }
         });
     }
+
+
 
     // ---------------- Registered user fetch (AUTO-FILL) ----------------
     const registeredSelect = document.getElementById('registered_user_id');

@@ -8,7 +8,7 @@ use Spatie\Permission\Models\Role;
 use App\Models\OrderStatus;
 
 
-class OrderstatusController extends Controller
+class OrderStatusController  extends Controller
 {
     public function index()
     {
