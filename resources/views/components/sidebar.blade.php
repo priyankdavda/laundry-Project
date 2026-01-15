@@ -1,11 +1,48 @@
 <nav class="mt-2">
     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-        <li class="nav-item">
-            <a href="{{ route('admin.dashboard') }}" class="nav-link {{ Route::is('admin.dashboard') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-tachometer-alt"></i>
-                <p>Dashboard</p>
-            </a>
-        </li>
+
+
+          @role('admin|vendor')
+            <li class="nav-item">
+                <a href="{{ route('admin.dashboard') }}" class="nav-link {{ Route::is('admin.dashboard') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                    <p>Dashboard</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.category.index') }}"
+                    class="nav-link {{ Route::is('admin.category.index') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-list-alt"></i>
+                    <p>Category
+                        <span class="badge badge-warning right">{{ $CategoryCount }}</span>
+                    </p>
+                </a>
+            </li>
+             <li class="nav-item">
+                <a href="{{ route('admin.product.index') }}"
+                    class="nav-link {{ Route::is('admin.product.index') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-th"></i>
+                    <p>Products
+                        <span class="badge badge-warning right">{{ $ProductCount }}</span>
+                    </p>
+                </a>
+            </li>
+             <li class="nav-item">
+                <a href="{{ route('admin.order.index') }}"
+                    class="nav-link {{ Route::is('admin.order.index') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-rocket"></i>
+                    <p>Order
+                        <span class="badge badge-success right">{{ $OrderCount }}</span>
+                    </p>
+                </a>
+            </li>
+             <li class="nav-item">
+                <a href="{{ route('admin.reports.index') }}" class="nav-link {{ Route::is('admin.reports.index') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-chart-line"></i>
+                    <p>Report</p>
+                </a>
+            </li>
+        @endrole
         @role('admin')
             <li class="nav-item">
                 <a href="{{ route('admin.user.index') }}"
@@ -34,15 +71,7 @@
                     </p>
                 </a>
             </li>  --}}
-            <li class="nav-item">
-                <a href="{{ route('admin.category.index') }}"
-                    class="nav-link {{ Route::is('admin.category.index') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-list-alt"></i>
-                    <p>Category
-                        <span class="badge badge-warning right">{{ $CategoryCount }}</span>
-                    </p>
-                </a>
-            </li>
+
             {{--  <li class="nav-item">
                 <a href="{{ route('admin.subcategory.index') }}"
                     class="nav-link {{ Route::is('admin.subcategory.index') ? 'active' : '' }}">
@@ -61,15 +90,7 @@
                     </p>
                 </a>
             </li>  --}}
-            <li class="nav-item">
-                <a href="{{ route('admin.product.index') }}"
-                    class="nav-link {{ Route::is('admin.product.index') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-th"></i>
-                    <p>Products
-                        <span class="badge badge-warning right">{{ $ProductCount }}</span>
-                    </p>
-                </a>
-            </li>
+
             <li class="nav-item">
                 <a href="{{ route('admin.orderstatus.index') }}"
                     class="nav-link {{ Route::is('admin.orderstatus.index') ? 'active' : '' }}">
@@ -79,23 +100,12 @@
                     </p>
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="{{ route('admin.order.index') }}"
-                    class="nav-link {{ Route::is('admin.order.index') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-rocket"></i>
-                    <p>Order
-                        <span class="badge badge-success right">{{ $OrderCount }}</span>
-                    </p>
-                </a>
-            </li>
+
 
         @endrole
-        <li class="nav-item">
-                <a href="{{ route('admin.reports.index') }}" class="nav-link {{ Route::is('admin.reports.index') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-chart-line"></i>
-                    <p>Report</p>
-                </a>
-            </li>
+
+
+
         {{--  <li class="nav-item">
             <a href="{{ route('admin.profile.edit') }}"
                 class="nav-link {{ Route::is('admin.profile.edit') ? 'active' : '' }}">

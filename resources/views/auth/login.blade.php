@@ -9,7 +9,7 @@
                 <a href="/" class="h1"><b>{{ config('app.name') }}</a>
             </div>
             <div class="card-body">
-                <p class="login-box-msg">Sign in to start your session</p>
+                <p class="login-box-msg">Sign in</p>
 
                 <form action="{{ route('login') }}" method="POST">
                     @csrf
@@ -34,14 +34,14 @@
                         <x-input-error :messages="$errors->get('password')" class="mt-2" />
                     </div>
                     <div class="row">
-                        <div class="col-8">
+                        {{--  <div class="col-8">
                             <div class="icheck-primary">
                                 <input type="checkbox" name="remember" id="remember">
                                 <label for="remember">
                                     Remember Me
                                 </label>
                             </div>
-                        </div>
+                        </div>  --}}
                         <!-- /.col -->
                         <div class="col-4">
                             <button type="submit" class="btn btn-primary btn-block">Sign In</button>
@@ -49,7 +49,7 @@
                         <!-- /.col -->
                     </div>
                 </form>
-                <div class="social-auth-links text-center mb-3">
+                {{--  <div class="social-auth-links text-center mb-3">
                     <p>- OR -</p>
                     <a href="{{ route('facebook.login') }}" class="btn btn-block btn-primary">
                         <i class="fab fa-facebook mr-2"></i> Sign in using Facebook
@@ -60,13 +60,13 @@
                     <a href="{{ route('github.login') }}" class="btn btn-block btn-dark">
                         <i class="fab fa-github mr-2"></i> Sign in using Github
                     </a>
-                </div>
-                <p class="mb-1">
+                </div>  --}}
+                {{--  <p class="mb-1">
                     <a href="{{ route('password.request') }}">I forgot my password</a>
                 </p>
                 <p class="mb-0">
                     <a href="{{ route('register') }}" class="text-center">Register a new Account</a>
-                </p>
+                </p>  --}}
             </div>
             <!-- /.card-body -->
         </div>

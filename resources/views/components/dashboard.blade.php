@@ -45,7 +45,7 @@
 </style>
 
 <div class="row">
-@role('admin')
+@role('admin|vendor')
 
     {{-- 1. TOTAL USERS --}}
     <div class="col-lg-3 col-6">
