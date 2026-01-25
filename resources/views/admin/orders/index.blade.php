@@ -57,6 +57,11 @@
                             <td>
                                 {{ \Carbon\Carbon::parse($order->pickup_date)->format('d-m-Y') }}<br>
                                 <small class="text-muted">{{ $order->pickup_timeslot }}</small>
+
+                                @if($order->assign_id)
+                                    <br>
+                                    <span class="text-success mt-2 font-weight-bold">ASSIGNED</span>
+                                @endif
                                 <br>
                                  <button class="btn btn-sm btn-warning mb-1"
                                             onclick="openPickupModal(
@@ -78,6 +83,10 @@
                             <td>
                                 {{ \Carbon\Carbon::parse($order->delivery_date)->format('d-m-Y') }}<br>
                                 <small class="text-muted">{{ $order->delivery_timeslot }}</small>
+                                @if($order->delivery_assign_id)
+
+                                    <span class="badge badge-info mt-2">ASSIGNED</span>
+                                @endif
                                 <br>
                                 <button
                                     class="btn btn-sm btn-warning mb-1 btn-change-delivery"
@@ -103,13 +112,28 @@
                                 {{ $order->created_at->format('d-m-Y') }}<br>
                                 <small class="text-muted">{{ $order->created_at->format('h:i A') }}</small>
                                 <br>
+
+                                @php
+                                $statusMap = [
+                                    'PICKUP'             => ['label' => 'Pickup Assigned', 'color' => 'info'],
+                                    'PROCESSING'         => ['label' => 'Processing', 'color' => 'warning'],
+                                    'READY_TO_DELIVERY'  => ['label' => 'Ready To Delivery', 'color' => 'primary'],
+                                    'DELIVERED_NOT_PAID' => ['label' => 'Delivered (Payment Pending)', 'color' => 'danger'],
+                                    'DELIVERED_PAID'     => ['label' => 'Delivered & Paid', 'color' => 'success'],
+                                    'CANCEL'             => ['label' => 'Cancelled', 'color' => 'danger'],
+                                ];
+                                @endphp
+
+                                <span class="text-{{ $statusMap[$order->status->code]['color'] ?? 'secondary' }} font-weight-bold">
+                                     {{ $statusMap[$order->status->code]['label'] ?? $order->status->name }}
+                                </span>
+
+                                    <br>
+                                    <br>
                                @if($order->status->code === 'DELIVERED_PAID')
 
                                     {{-- ✅ Final Delivered Paid View --}}
-                                    <span class="text-success font-weight-bold">
-                                        Delivered Paid
-                                    </span>
-                                    <br>
+
 
                                     <span class="badge badge-primary mt-1">
                                         Paid Date:
@@ -656,7 +680,7 @@ $(function () {
         ordering: true,
         responsive: true,
         pageLength: 25,
-        order: [[8, 'desc']], // Order Date column
+        order: [[0, 'desc']], // Order Date column
         columnDefs: [
             { orderable: false, targets: [-1] } // Action column disable sort
         ]
