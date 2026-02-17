@@ -212,6 +212,15 @@
 
                                 @endif
 
+                                <form action="{{ route('admin.order.sendWhatsApp', $order->id) }}"
+      method="POST"
+      style="display:inline">
+    @csrf
+    <button type="submit" class="btn btn-success btn-sm">
+        📲 Send WhatsApp
+    </button>
+</form>
+
 
                             </td>
                         </tr>

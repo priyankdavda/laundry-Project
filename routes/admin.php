@@ -15,7 +15,28 @@ use App\Http\Controllers\OrderStatusController ;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReportController;
 
+
+use App\Models\Order;
+use App\Services\WhatsAppService;
+
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(function () {
+
+
+    Route::get('/whatsapp-test', function () {
+
+        // 🔴 YAHAN apna REAL Meta test number daalo
+        $mobile = '917405650340'; // example: 919876543210
+
+        $order = Order::latest()->first();
+
+        if (!$order) {
+            return response()->json([
+                'error' => 'No order found. Please create an order first.'
+            ], 404);
+        }
+
+        return WhatsAppService::sendOrderCreatedMessage($mobile, $order);
+    });
 
     Route::get('/dashboard',[ProfileController::class,'dashboard'])->name('dashboard');
 
@@ -72,6 +93,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::post('/reports', [ReportController::class, 'filter'])->name('reports.filter');
     });
+
+    Route::post('order/{order}/send-whatsapp', [OrderController::class, 'sendWhatsApp'])
+    ->name('order.sendWhatsApp');
 
     /*
     |--------------------------------------------------------------------------

@@ -21,6 +21,10 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use App\Services\WhatsAppService;
 
+use Twilio\Rest\Client;
+
+
+
 class OrderController extends Controller
 {
     /**
@@ -222,19 +226,6 @@ class OrderController extends Controller
 
             DB::commit();
 
-
-            /* ================= WHATSAPP TEST MESSAGE ================= */
-            try {
-                $mobile = '91' . $order->customer_mobile; // country code zaroori
-                WhatsAppService::sendOrderCreatedMessage($mobile, $order);
-            }catch (\Exception $e) {
-                \Log::error('WhatsApp Error', [
-                    'message' => $e->getMessage(),
-                    'response' => method_exists($e, 'getResponse') ? $e->getResponse() : null
-                ]);
-                die('sadasdasdas');
-            }
-
             $pdf = Pdf::loadView('admin.orders.invoice', [
                 'order' => $order
             ]);
@@ -248,6 +239,31 @@ class OrderController extends Controller
             $pdfPath = $path.'/'.$fileName;
 
             $pdf->save($pdfPath);
+
+            /* ================= WHATSAPP TEST MESSAGE ================= */
+            try {
+                $mobile = '91' . $order->customer_mobile; // country code zaroori
+                WhatsAppService::sendOrderCreatedMessage($mobile, $order);
+            }catch (\Exception $e) {
+                \Log::error('WhatsApp Error', [
+                    'message' => $e->getMessage(),
+                    'response' => method_exists($e, 'getResponse') ? $e->getResponse() : null
+                ]);
+            }
+
+            // $pdf = Pdf::loadView('admin.orders.invoice', [
+            //     'order' => $order
+            // ]);
+
+            // $path = storage_path('app/invoices');
+            // if (!file_exists($path)) {
+            //     mkdir($path, 0777, true);
+            // }
+
+            // $fileName = 'invoice_'.$order->order_number.'.pdf';
+            // $pdfPath = $path.'/'.$fileName;
+
+            // $pdf->save($pdfPath);
 
             return redirect()
                 ->route('admin.order.index')
@@ -525,6 +541,60 @@ public function statusHistory(Order $order)
 
     return response()->json($history);
 }
+
+
+public function sendWhatsApp(Order $order)
+{
+    $mobile = '91' . $order->customer_mobile;
+
+    // $fileName = 'invoice_' . $order->order_number . '.pdf';
+     $fileName = 'invoice_ORDA0001.pdf';
+    $invoiceUrl = asset('storage/app/invoices/' . $fileName);
+
+    $response = WhatsAppService::sendInvoiceTemplate(
+        $mobile,
+        $order,
+        $invoiceUrl
+    );
+
+    if ($response->failed()) {
+        dd($response->json());
+    }
+
+    return back()->with('success', 'Invoice sent via WhatsApp');
+}
+
+
+public function sendInvoice(Order $order)
+{
+    $twilio = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
+
+    $fileName = 'invoice_ORDA0001.pdf';
+    $invoiceUrl = asset('storage/app/invoices/' . $fileName);
+
+    $contentVariables = json_encode([
+        "1" => $order->customer_name,
+        "2" => $order->order_number,
+        "3" => $invoiceUrl,
+    ]);
+
+    // dd($contentVariables);
+
+    $message = $twilio->messages->create(
+        "whatsapp:+91" . $order->customer_mobile,
+        [
+            "from" => env('TWILIO_WHATSAPP_FROM'),
+            "contentSid" => "HX1cb7414f8a8dc240ca9696cf25664732",
+            "contentVariables" => $contentVariables
+        ]
+    );
+
+    return back()->with('success', 'Invoice sent on WhatsApp');
+}
+
+
+
+
 
 
 
