@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\LoginWithOTPController;
 use App\Http\Controllers\SocialiteController;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 /*
@@ -23,8 +24,47 @@ use Illuminate\Support\Str;
 //     ]);
 // });
 Route::get('/', function () {
-    return redirect()->route('login');
+
+    // $token = env('WHATSAPP_TOKEN');
+    // $phoneNumberId = env('WHATSAPP_PHONE_NUMBER_ID');
+
+    // $url = "https://graph.facebook.com/v24.0/{$phoneNumberId}/messages";
+
+    // return Http::withToken($token)->post($url, [
+    //     "messaging_product" => "whatsapp",
+    //     "to" => "917405650340",
+    //     "type" => "template",
+    //     "template" => [
+    //         "name" => "invoice_ready",
+    //         "language" => [
+    //             "code" => "en"
+    //         ],
+    //         "components" => [
+    //             [
+    //                 "type" => "body",
+    //                 "parameters" => [
+    //                     [
+    //                         "type" => "text",
+    //                         "text" => "HI ORDER"
+    //                     ],
+    //                     [
+    //                         "type" => "text",
+    //                         "text" => "HI ORDER"
+    //                     ],
+    //                     [
+    //                         "type" => "text",
+    //                         "text" => "HI ORDER"
+    //                     ],
+    //                 ]
+    //             ]
+    //         ]
+    //     ]
+    // ]);
+    dd('dfdf');
+    // return redirect()->route('login');
 });
+
+
 // Login with OTP Routes
 Route::prefix('/otp')->middleware('guest')->name('otp.')->controller(LoginWithOTPController::class)->group(function(){
     Route::get('/login','login')->name('login');

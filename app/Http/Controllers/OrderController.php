@@ -230,7 +230,7 @@ class OrderController extends Controller
                 'order' => $order
             ]);
 
-            $path = storage_path('app/invoices');
+            $path = storage_path('app/public/invoices');
             if (!file_exists($path)) {
                 mkdir($path, 0777, true);
             }
@@ -242,8 +242,23 @@ class OrderController extends Controller
 
             /* ================= WHATSAPP TEST MESSAGE ================= */
             try {
-                $mobile = '91' . $order->customer_mobile; // country code zaroori
-                WhatsAppService::sendOrderCreatedMessage($mobile, $order);
+
+                    $mobile = '91' . $order->customer_mobile;
+
+                    $fileName = 'invoice_' . $order->order_number . '.pdf';
+                    //  $fileName = 'invoice_ORDA0001.pdf';
+                    $invoiceUrl = asset('storage/invoices/' . $fileName);
+
+                    $response = WhatsAppService::sendInvoiceTemplate(
+                        $mobile,
+                        $order,
+                        $invoiceUrl
+                    );
+
+                    if ($response->failed()) {
+                        dd($response->json());
+                    }
+
             }catch (\Exception $e) {
                 \Log::error('WhatsApp Error', [
                     'message' => $e->getMessage(),
@@ -547,8 +562,8 @@ public function sendWhatsApp(Order $order)
 {
     $mobile = '91' . $order->customer_mobile;
 
-    // $fileName = 'invoice_' . $order->order_number . '.pdf';
-     $fileName = 'invoice_ORDA0001.pdf';
+    $fileName = 'invoice_' . $order->order_number . '.pdf';
+    //  $fileName = 'invoice_ORDA0001.pdf';
     $invoiceUrl = asset('storage/app/invoices/' . $fileName);
 
     $response = WhatsAppService::sendInvoiceTemplate(
